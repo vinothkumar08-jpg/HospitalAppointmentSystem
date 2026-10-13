@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Find a doctor and plan your next appointment.">
+    <title>{% block title %}CarePoint Hospital{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script defer src="{{ url_for('static', filename='js/app.js') }}"></script>
+</head>
+<body>
+    <header class="site-header">
+        <a class="brand" href="{{ url_for('home') }}" aria-label="CarePoint Hospital home">
+            <span class="brand-mark" aria-hidden="true">+</span>
+            <span>CarePoint <span class="brand-light">Hospital</span></span>
+        </a>
+        <nav aria-label="Main navigation">
+            {% if g.user %}
+                {% if g.user["role"] == "doctor" %}
+                    <a href="{{ url_for('doctor_dashboard') }}">Dashboard</a>
+                {% elif g.user["role"] == "patient" %}
+                    <a href="{{ url_for('dashboard') }}">Dashboard</a>
+                    <a href="{{ url_for('patient_appointments') }}">Appointments</a>
+                {% elif g.user["role"] == "admin" %}
+                    <a href="{{ url_for('admin_dashboard') }}">Admin dashboard</a>
+                {% endif %}
+                <a href="{{ url_for('home') }}#doctors">Our doctors</a>
+                <form class="nav-logout" action="{{ url_for('logout') }}" method="post">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                    <button class="nav-button" type="submit">Sign out</button>
+                </form>
+            {% else %}
+                <a href="{{ url_for('home') }}#doctors">Our doctors</a>
+                <a href="{{ url_for('login') }}">Sign in</a>
+                <a href="{{ url_for('admin_login') }}">Admin</a>
+                <a class="nav-button" href="{{ url_for('register', role='patient') }}">Register</a>
+            {% endif %}
+        </nav>
+    </header>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-list" role="status" aria-live="polite">
+                {% for category, message in messages %}
+                    <p class="flash-message flash-{{ category }}">{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+        <span>CarePoint Hospital</span>
+        <span>Local learning project · Sample data only</span>
+    </footer>
+</body>
+</html>

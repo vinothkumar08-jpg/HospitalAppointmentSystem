@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}{{ role|capitalize }} dashboard | CarePoint Hospital{% endblock %}
+
+{% block content %}
+    <section class="dashboard-page">
+        <p class="eyebrow">{{ role|upper }} DASHBOARD</p>
+        <h1>Welcome, {{ g.user["full_name"] }}</h1>
+        {% if role == "patient" %}
+            <div class="dashboard-card">
+                <h2>Your appointments</h2>
+                <p>{{ upcoming_count }} upcoming and {{ previous_count }} previous appointment(s).</p>
+                <div class="dashboard-actions">
+                    <a class="primary-button" href="{{ url_for('patient_appointments') }}">View appointments</a>
+                    <a class="primary-button" href="{{ url_for('home') }}#doctors">Browse doctors</a>
+                </div>
+            </div>
+        {% elif doctor %}
+            <div class="dashboard-card">
+                <h2>Your doctor profile</h2>
+                <p><strong>Specialization:</strong> {{ doctor["specialization"] }}</p>
+                <p><strong>Experience:</strong> {{ doctor["experience_years"] }} years</p>
+                <p><strong>Availability:</strong> {{ doctor["availability"] }}</p>
+                {% if doctor["bio"] %}
+                    <p>{{ doctor["bio"] }}</p>
+                {% endif %}
+            </div>
+        {% endif %}
+    </section>
+{% endblock %}

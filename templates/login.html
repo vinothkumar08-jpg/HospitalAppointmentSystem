@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}{% if admin_login %}Admin sign in{% else %}Sign in{% endif %} | CarePoint Hospital{% endblock %}
+
+{% block content %}
+    <section class="form-page">
+        <div class="form-card">
+            <p class="eyebrow">{% if admin_login %}ADMINISTRATION{% else %}WELCOME BACK{% endif %}</p>
+            <h1>{% if admin_login %}Administrator sign in{% else %}Sign in{% endif %}</h1>
+            <p class="form-intro">
+                {% if admin_login %}
+                    Use the administrator account created from the VS Code terminal.
+                {% else %}
+                    Sign in to continue to your CarePoint account.
+                {% endif %}
+            </p>
+
+            <form method="post" class="account-form">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                <label for="email">Email address</label>
+                <input id="email" name="email" type="email" maxlength="254"
+                       autocomplete="username" required value="{{ request.form.get('email', '') }}">
+
+                <label for="password">Password</label>
+                <input id="password" name="password" type="password"
+                       autocomplete="current-password" required>
+
+                <button class="primary-button form-submit" type="submit">Sign in</button>
+            </form>
+
+            {% if admin_login %}
+                <p class="form-switch"><a href="{{ url_for('login') }}">Patient or doctor sign in</a></p>
+            {% else %}
+                <p class="form-switch">
+                    New here? <a href="{{ url_for('register', role='patient') }}">Create a patient account</a>
+                </p>
+                <p class="form-switch">
+                    Doctor? <a href="{{ url_for('register', role='doctor') }}">Create a doctor account</a>
+                </p>
+            {% endif %}
+        </div>
+    </section>
+{% endblock %}

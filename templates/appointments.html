@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}My appointments | CarePoint Hospital{% endblock %}
+
+{% block content %}
+    <section class="appointments-page">
+        <p class="eyebrow">PATIENT DASHBOARD</p>
+        <h1>My appointments</h1>
+        <p class="appointments-intro">Appointment requests appear as Pending until an administrator confirms them.</p>
+
+        <section class="appointment-panel">
+            <h2>Upcoming</h2>
+            {% if upcoming %}
+                <div class="appointment-list">
+                    {% for appointment in upcoming %}
+                        <article class="appointment-card">
+                            <div class="appointment-details">
+                                <h3>{{ appointment["doctor_name"] }}</h3>
+                                <p>{{ appointment["specialization"] }}</p>
+                                <p>{{ appointment["appointment_date"] }} at {{ appointment["time_slot"] }}</p>
+                            </div>
+                            <div class="appointment-actions">
+                                <span class="status-badge status-{{ appointment['status']|lower }}">{{ appointment["status"] }}</span>
+                                <form action="{{ url_for('cancel_appointment', appointment_id=appointment['id']) }}"
+                                      method="post" data-confirm="Cancel this appointment?">
+                                    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                                    <button class="text-button delete-button" type="submit">Cancel</button>
+                                </form>
+                            </div>
+                        </article>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="empty-state">You have no upcoming appointments.</p>
+            {% endif %}
+        </section>
+
+        <section class="appointment-panel">
+            <h2>Previous and cancelled</h2>
+            {% if previous %}
+                <div class="appointment-list">
+                    {% for appointment in previous %}
+                        <article class="appointment-card">
+                            <div class="appointment-details">
+                                <h3>{{ appointment["doctor_name"] }}</h3>
+                                <p>{{ appointment["specialization"] }}</p>
+                                <p>{{ appointment["appointment_date"] }} at {{ appointment["time_slot"] }}</p>
+                            </div>
+                            <span class="status-badge status-{{ appointment['status']|lower }}">{{ appointment["status"] }}</span>
+                        </article>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="empty-state">Your previous appointments will appear here.</p>
+            {% endif %}
+        </section>
+    </section>
+{% endblock %}

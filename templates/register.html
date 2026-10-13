@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Create {{ role }} account | CarePoint Hospital{% endblock %}
+
+{% block content %}
+    <section class="form-page">
+        <div class="form-card">
+            <p class="eyebrow">JOIN CAREPOINT</p>
+            <h1>Create a {{ role }} account</h1>
+            <p class="form-intro">Use dummy details only while trying this local learning project.</p>
+
+            <form method="post" class="account-form">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                <label for="full_name">Full name</label>
+                <input id="full_name" name="full_name" type="text" maxlength="120"
+                       autocomplete="name" required value="{{ request.form.get('full_name', '') }}">
+
+                <label for="email">Email address</label>
+                <input id="email" name="email" type="email" maxlength="254"
+                       autocomplete="email" required value="{{ request.form.get('email', '') }}">
+
+                <label for="password">Password</label>
+                <input id="password" name="password" type="password" minlength="10"
+                       autocomplete="new-password" required>
+                <span class="field-hint">Use at least 10 characters.</span>
+
+                {% if role == "doctor" %}
+                    <label for="specialization">Specialization</label>
+                    <input id="specialization" name="specialization" type="text" maxlength="100"
+                           required value="{{ request.form.get('specialization', '') }}">
+
+                    <label for="experience_years">Years of experience</label>
+                    <input id="experience_years" name="experience_years" type="number"
+                           min="0" max="80" required value="{{ request.form.get('experience_years', '') }}">
+
+                    <fieldset class="schedule-fieldset">
+                        <legend>Available days</legend>
+                        <div class="weekday-options">
+                            {% for value, day_name in weekday_options %}
+                                <label class="weekday-option">
+                                    <input name="weekdays" type="checkbox" value="{{ value }}"
+                                           {% if value in selected_weekdays %}checked{% endif %}>
+                                    <span>{{ day_name }}</span>
+                                </label>
+                            {% endfor %}
+                        </div>
+                    </fieldset>
+
+                    <div class="time-range">
+                        <div>
+                            <label for="start_time">Start time</label>
+                            <input id="start_time" name="start_time" type="time"
+                                   required value="{{ request.form.get('start_time', '09:00') }}">
+                        </div>
+                        <div>
+                            <label for="end_time">End time</label>
+                            <input id="end_time" name="end_time" type="time"
+                                   required value="{{ request.form.get('end_time', '17:00') }}">
+                        </div>
+                    </div>
+
+                    <label for="bio">Short profile</label>
+                    <textarea id="bio" name="bio" maxlength="500" rows="3">{{ request.form.get('bio', '') }}</textarea>
+                {% endif %}
+
+                <button class="primary-button form-submit" type="submit">Create account</button>
+            </form>
+
+            <p class="form-switch">
+                Already have an account? <a href="{{ url_for('login') }}">Sign in</a>
+            </p>
+            {% if role == "patient" %}
+                <p class="form-switch">
+                    Are you a doctor? <a href="{{ url_for('register', role='doctor') }}">Create a doctor account</a>
+                </p>
+            {% else %}
+                <p class="form-switch">
+                    Are you a patient? <a href="{{ url_for('register', role='patient') }}">Create a patient account</a>
+                </p>
+            {% endif %}
+        </div>
+    </section>
+{% endblock %}

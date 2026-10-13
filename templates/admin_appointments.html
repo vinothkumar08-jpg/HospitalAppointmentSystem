@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Manage appointments | CarePoint Hospital{% endblock %}
+
+{% block content %}
+    <section class="appointments-page">
+        <p class="eyebrow">SYSTEM MANAGEMENT</p>
+        <h1>Manage appointments</h1>
+        <p class="appointments-intro">Confirm patient requests, cancel bookings, or mark confirmed visits as completed.</p>
+        <p><a class="text-button" href="{{ url_for('admin_dashboard') }}">Back to admin dashboard</a></p>
+
+        <section class="appointment-panel">
+            {% if appointments %}
+                <div class="table-wrap">
+                    <table class="doctor-table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Patient</th>
+                                <th scope="col">Doctor</th>
+                                <th scope="col">Date and time</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Update</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for appointment in appointments %}
+                                <tr>
+                                    <td>
+                                        {{ appointment["patient_name"] }}
+                                        <span class="table-subtext">{{ appointment["patient_email"] }}</span>
+                                    </td>
+                                    <td>
+                                        {{ appointment["doctor_name"] }}
+                                        <span class="table-subtext">{{ appointment["specialization"] }}</span>
+                                    </td>
+                                    <td>{{ appointment["appointment_date"] }}<span class="table-subtext">{{ appointment["time_slot"] }}</span></td>
+                                    <td><span class="status-badge status-{{ appointment['status']|lower }}">{{ appointment["status"] }}</span></td>
+                                    <td>
+                                        {% if appointment["status"] in ("Pending", "Confirmed") %}
+                                            <form class="status-form" action="{{ url_for('admin_update_appointment_status', appointment_id=appointment['id']) }}" method="post">
+                                                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                                                <select name="status" aria-label="New status for appointment {{ appointment['id'] }}">
+                                                    {% if appointment["status"] == "Pending" %}
+                                                        <option value="Confirmed">Confirm</option>
+                                                    {% else %}
+                                                        <option value="Completed">Complete</option>
+                                                    {% endif %}
+                                                    <option value="Cancelled">Cancel</option>
+                                                </select>
+                                                <button class="text-button" type="submit">Save</button>
+                                            </form>
+                                        {% else %}
+                                            <span class="table-subtext">No further changes</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="empty-state">There are no appointments to manage yet.</p>
+            {% endif %}
+        </section>
+    </section>
+{% endblock %}

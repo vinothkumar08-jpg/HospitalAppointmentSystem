@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Edit doctor profile | CarePoint Hospital{% endblock %}
+
+{% block content %}
+    <section class="form-page">
+        <div class="form-card">
+            <p class="eyebrow">SYSTEM MANAGEMENT</p>
+            <h1>Edit doctor profile</h1>
+            <form class="account-form" action="{{ url_for('admin_edit_doctor', doctor_id=doctor['id']) }}" method="post">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                <label for="name">Doctor name</label>
+                <input id="name" name="name" type="text" maxlength="120" required value="{{ doctor['name'] }}">
+
+                <label for="specialization">Specialization</label>
+                <input id="specialization" name="specialization" type="text" maxlength="100"
+                       required value="{{ doctor['specialization'] }}">
+
+                <label for="experience_years">Years of experience</label>
+                <input id="experience_years" name="experience_years" type="number" min="0" max="80"
+                       required value="{{ doctor['experience_years'] }}">
+
+                <fieldset class="schedule-fieldset">
+                    <legend>Available days</legend>
+                    <div class="weekday-options">
+                        {% for value, day_name in weekday_options %}
+                            <label class="weekday-option">
+                                <input name="weekdays" type="checkbox" value="{{ value }}"
+                                       {% if value in selected_weekdays %}checked{% endif %}>
+                                <span>{{ day_name }}</span>
+                            </label>
+                        {% endfor %}
+                    </div>
+                </fieldset>
+
+                <div class="time-range">
+                    <div>
+                        <label for="start_time">Start time</label>
+                        <input id="start_time" name="start_time" type="time" required
+                               value="{{ start_time }}">
+                    </div>
+                    <div>
+                        <label for="end_time">End time</label>
+                        <input id="end_time" name="end_time" type="time" required
+                               value="{{ end_time }}">
+                    </div>
+                </div>
+
+                <label for="bio">Short profile</label>
+                <textarea id="bio" name="bio" maxlength="500" rows="3">{{ doctor['bio'] }}</textarea>
+
+                <button class="primary-button form-submit" type="submit">Save changes</button>
+                <a class="cancel-link" href="{{ url_for('admin_dashboard') }}">Cancel</a>
+            </form>
+        </div>
+    </section>
+{% endblock %}

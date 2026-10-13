@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Book with {{ doctor["name"] }} | CarePoint Hospital{% endblock %}
+
+{% block content %}
+    <section class="form-page">
+        <div class="form-card booking-card">
+            <p class="eyebrow">APPOINTMENT BOOKING</p>
+            <h1>{{ doctor["name"] }}</h1>
+            <p class="form-intro">
+                {{ doctor["specialization"] }} · {{ doctor["availability"] }}
+            </p>
+
+            <form class="account-form date-search-form" action="{{ url_for('book_appointment', doctor_id=doctor['id']) }}" method="get">
+                <label for="date">Choose a date</label>
+                <input id="date" name="date" type="date" min="{{ today }}" required value="{{ selected_date }}">
+                <button class="primary-button form-submit" type="submit">Show available times</button>
+            </form>
+
+            {% if slots %}
+                <form class="account-form slot-form" action="{{ url_for('book_appointment', doctor_id=doctor['id']) }}" method="post">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="date" value="{{ selected_date }}">
+                    <label for="time_slot">Available 30-minute appointment times</label>
+                    <select id="time_slot" name="time_slot" required>
+                        {% for slot in slots %}
+                            <option value="{{ slot }}">{{ slot }}</option>
+                        {% endfor %}
+                    </select>
+                    <button class="primary-button form-submit" type="submit">Request appointment</button>
+                    <p class="field-hint">New requests are marked Pending until an administrator confirms them.</p>
+                </form>
+            {% else %}
+                <p class="no-slots">No appointment times are available for this doctor on that date.</p>
+            {% endif %}
+            <p class="form-switch"><a href="{{ url_for('home') }}#doctors">Back to doctors</a></p>
+        </div>
+    </section>
+{% endblock %}

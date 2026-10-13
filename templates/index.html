@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}CarePoint Hospital | Appointments{% endblock %}
+
+{% block content %}
+    <section class="hero">
+        <div class="hero-content">
+            <p class="eyebrow">CARE THAT PUTS YOU FIRST</p>
+            <h1>Feel better with care you can count on.</h1>
+            <p class="hero-copy">
+                Meet our care team and find the right specialist for your needs.
+                Choose a doctor and find an appointment time that matches their schedule.
+            </p>
+            <a class="primary-button" href="#doctors">Meet our doctors <span aria-hidden="true">→</span></a>
+        </div>
+        <div class="hero-note">
+            <span class="note-icon" aria-hidden="true">+</span>
+            <div>
+                <strong>Here for your health</strong>
+                <span>Friendly care, close to home</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="doctors-section" id="doctors">
+        <div class="section-heading">
+            <div>
+                <p class="eyebrow">YOUR CARE TEAM</p>
+                <h2>Meet our doctors</h2>
+            </div>
+            <p>Search by name or specialty, then book from a doctor's available weekly schedule.</p>
+        </div>
+
+        <form class="doctor-filter" action="{{ url_for('home') }}" method="get">
+            <label>
+                Search doctors
+                <input type="search" name="q" value="{{ search_term }}"
+                       placeholder="Name, specialty, or care area">
+            </label>
+            <label>
+                Specialization
+                <select name="specialization">
+                    <option value="">All specializations</option>
+                    {% for item in specializations %}
+                        <option value="{{ item['specialization'] }}"
+                                {% if item["specialization"] == selected_specialization %}selected{% endif %}>
+                            {{ item["specialization"] }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </label>
+            <button class="primary-button" type="submit">Search</button>
+            {% if search_term or selected_specialization %}
+                <a class="clear-filter" href="{{ url_for('home') }}">Clear</a>
+            {% endif %}
+        </form>
+
+        <div class="doctor-grid">
+            {% for doctor in doctors %}
+                <article class="doctor-card">
+                    <div class="doctor-avatar" aria-hidden="true">{{ doctor["name"].split()[-1][0] }}</div>
+                    <p class="specialty">{{ doctor["specialization"] }}</p>
+                    <h3>{{ doctor["name"] }}</h3>
+                    <p class="experience">{{ doctor["experience_years"] }} years of experience</p>
+                    <p class="doctor-bio">{{ doctor["bio"] }}</p>
+                    <div class="availability">
+                        <span class="availability-dot" aria-hidden="true"></span>
+                        <span>{{ doctor["availability"] }}</span>
+                    </div>
+                    {% if g.user and g.user["role"] == "patient" %}
+                        <a class="book-button" href="{{ url_for('book_appointment', doctor_id=doctor['id']) }}">Book appointment</a>
+                    {% elif not g.user %}
+                        <a class="book-button" href="{{ url_for('login') }}">Sign in to book</a>
+                    {% endif %}
+                </article>
+            {% else %}
+                <p class="empty-state">No doctors match those filters. Try another search.</p>
+            {% endfor %}
+        </div>
+    </section>
+{% endblock %}

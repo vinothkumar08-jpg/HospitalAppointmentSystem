@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}Admin dashboard | CarePoint Hospital{% endblock %}
+
+{% block content %}
+    <section class="admin-page">
+        <p class="eyebrow">SYSTEM MANAGEMENT</p>
+        <h1>Administrator dashboard</h1>
+        <p class="admin-intro">Manage doctor profiles and review basic system totals.</p>
+
+        <div class="stat-grid">
+            <article class="stat-card">
+                <span>Doctor profiles</span>
+                <strong>{{ counts["doctors"] }}</strong>
+            </article>
+            <article class="stat-card">
+                <span>Patient accounts</span>
+                <strong>{{ counts["patients"] }}</strong>
+            </article>
+            <article class="stat-card">
+                <span>Appointments</span>
+                <strong>{{ counts["appointments"] }}</strong>
+            </article>
+        </div>
+
+        <section class="admin-panel">
+            <h2>Add a doctor profile</h2>
+            <form class="admin-doctor-form" action="{{ url_for('admin_add_doctor') }}" method="post">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                <label>
+                    Doctor name
+                    <input name="name" type="text" maxlength="120" required>
+                </label>
+                <label>
+                    Specialization
+                    <input name="specialization" type="text" maxlength="100" required>
+                </label>
+                <label>
+                    Years of experience
+                    <input name="experience_years" type="number" min="0" max="80" required>
+                </label>
+                <fieldset class="schedule-fieldset wide-field">
+                    <legend>Available days</legend>
+                    <div class="weekday-options">
+                        {% for value, day_name in weekday_options %}
+                            <label class="weekday-option">
+                                <input name="weekdays" type="checkbox" value="{{ value }}">
+                                <span>{{ day_name }}</span>
+                            </label>
+                        {% endfor %}
+                    </div>
+                </fieldset>
+                <label>
+                    Start time
+                    <input name="start_time" type="time" value="09:00" required>
+                </label>
+                <label>
+                    End time
+                    <input name="end_time" type="time" value="17:00" required>
+                </label>
+                <label class="wide-field">
+                    Short profile
+                    <textarea name="bio" maxlength="500" rows="2"></textarea>
+                </label>
+                <button class="primary-button" type="submit">Add doctor</button>
+            </form>
+        </section>
+
+        <section class="admin-panel">
+            <div class="panel-heading">
+                <div>
+                    <h2>Doctor profiles</h2>
+                    <p>Profiles with appointment history cannot be removed, to preserve records.</p>
+                </div>
+                <a class="primary-button" href="{{ url_for('admin_appointments') }}">Manage appointments</a>
+            </div>
+            {% if doctors %}
+                <div class="table-wrap">
+                    <table class="doctor-table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Doctor</th>
+                                <th scope="col">Specialization</th>
+                                <th scope="col">Experience</th>
+                                <th scope="col">Availability</th>
+                                <th scope="col">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for doctor in doctors %}
+                                <tr>
+                                    <td>{{ doctor["name"] }}</td>
+                                    <td>{{ doctor["specialization"] }}</td>
+                                    <td>{{ doctor["experience_years"] }} years</td>
+                                    <td>{{ doctor["availability"] }}</td>
+                                    <td class="table-actions">
+                                        <a class="text-button" href="{{ url_for('admin_edit_doctor', doctor_id=doctor['id']) }}">Edit</a>
+                                        <form action="{{ url_for('admin_delete_doctor', doctor_id=doctor['id']) }}"
+                                              method="post" data-confirm="Remove this doctor profile?">
+                                            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                                            <button class="text-button delete-button" type="submit">Remove</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="empty-state">There are no doctor profiles to manage.</p>
+            {% endif %}
+        </section>
+    </section>
+{% endblock %}
